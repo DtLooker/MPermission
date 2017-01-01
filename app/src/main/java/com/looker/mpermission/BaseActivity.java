@@ -1,5 +1,6 @@
 package com.looker.mpermission;
 
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -13,6 +14,7 @@ import java.util.List;
 public class BaseActivity extends AppCompatActivity {
 
     private PermissionListener mListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,17 +34,19 @@ public class BaseActivity extends AppCompatActivity {
     public void requestRuntimePermission(String[] permissions, PermissionListener listener){
         mListener = listener;
 
+        Activity topActivity = ActivityCollector.getTopActivity();
+
         List<String> permissionList = new ArrayList<>();
         /**判断是否已经授权**/
         for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
+            if (ContextCompat.checkSelfPermission(topActivity, permission) != PackageManager.PERMISSION_GRANTED){
                 permissionList.add(permission);
             }
         }
 
         /**未授权就申请授权**/
         if (!permissionList.isEmpty()) {
-            ActivityCompat.requestPermissions(this, permissionList.toArray(new String[permissionList.size()]), 0);
+            ActivityCompat.requestPermissions(topActivity, permissionList.toArray(new String[permissionList.size()]), 0);
         }else {
             mListener.permissionGranted();
         }
